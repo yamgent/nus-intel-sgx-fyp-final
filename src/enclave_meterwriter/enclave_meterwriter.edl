@@ -1,0 +1,42 @@
+enclave {
+    from "sgx_tkey_exchange.edl" import *;
+    include "sgx_tcrypto.h"
+    include "sgx_tkey_exchange.h"
+
+    trusted {
+        public int32_t ecall_initialize();
+
+
+        // CA
+        public int32_t ecall_generate_ca_key_pair(
+            uint64_t sealed_buffer_size, [out,size=sealed_buffer_size]uint8_t* sealed_buffer,
+            [out]uint64_t* actual_sealed_data_size);
+        
+        public int32_t ecall_load_ca_key_pair(
+            uint64_t sealed_buffer_size, [in,size=sealed_buffer_size]uint8_t* sealed_buffer);
+
+        public int32_t ecall_is_my_public_ca_key([in]sgx_ec256_public_t* public_key,
+            [out]int8_t* result_is_my_key);
+        
+        public int32_t ecall_get_public_ca_key([out]sgx_ec256_public_t* public_key);
+
+
+        // attestation
+        public int32_t ecall_start_attestation(
+            [in]sgx_ec256_public_t* client_public_key, [out]sgx_ra_context_t* ra_context);
+        public int32_t ecall_finish_attestation(sgx_ra_context_t ra_context);
+
+        
+        public int32_t ecall_add_meter_and_sign(
+            uint32_t input_buffer_size, [in, size=input_buffer_size] uint8_t* input_buffer, 
+            uint32_t actual_input_size, [in] sgx_aes_gcm_128bit_tag_t* input_mac,
+            [in,size=12] uint8_t* input_iv,
+            uint32_t output_buffer_size, [out, size=output_buffer_size] uint8_t* output_buffer,
+            [out]uint32_t* actual_output_size, [out] sgx_aes_gcm_128bit_tag_t* output_mac,
+            [out, size=12] uint8_t* output_iv,
+            [out]sgx_sha256_hash_t* hash, [out]sgx_ec256_signature_t* signature);
+    };
+
+    untrusted {
+    };
+};

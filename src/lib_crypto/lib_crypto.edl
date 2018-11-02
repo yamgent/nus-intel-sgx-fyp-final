@@ -1,0 +1,51 @@
+enclave {
+    include "sgx_tcrypto.h"
+
+    trusted {
+        public int32_t lc_ecall_init();
+        public int32_t lc_ecall_create_ecc_keypair(
+            [out]sgx_ec256_private_t* private_key,
+            [out]sgx_ec256_public_t* public_key);
+        public int32_t lc_ecall_ecdsa_sign(
+            uint32_t data_size, [in, size=data_size] uint8_t* data, 
+            sgx_ec256_private_t private_key, 
+            [out] sgx_ec256_signature_t* signature);
+        public int32_t lc_ecall_ecdsa_verify(
+            uint32_t data_size, [in, size=data_size] uint8_t* data, 
+            sgx_ec256_public_t public_key, 
+            [in] sgx_ec256_signature_t* signature,
+            [out] uint8_t* result);
+        public int32_t lc_ecall_ecc_compute_shared_dhkey(
+                sgx_ec256_private_t b, 
+                sgx_ec256_public_t ga, 
+                [out] sgx_ec256_dh_shared_t* gab);
+        
+        public int32_t lc_ecall_aes_cmac(
+                [in] sgx_cmac_128bit_key_t* key,
+                uint32_t data_size,
+                [in, size=data_size] uint8_t* data,
+                [out] sgx_cmac_128bit_tag_t* hash);
+
+        public int32_t lc_ecall_aes_encrypt(
+                [in] sgx_aes_gcm_128bit_key_t* key,
+                uint32_t data_and_output_size, [in, size=data_and_output_size] uint8_t* data,
+                [out, size=data_and_output_size] uint8_t* output,
+                uint32_t iv_size, [in, size=iv_size] uint8_t* iv,
+                [out] sgx_aes_gcm_128bit_tag_t* mac);
+        public int32_t lc_ecall_aes_decrypt(
+                [in] sgx_aes_gcm_128bit_key_t* key,
+                uint32_t data_and_output_size, [in, size=data_and_output_size] uint8_t* data,
+                [out, size=data_and_output_size] uint8_t* output,
+                uint32_t iv_size, [in, size=iv_size] uint8_t* iv,
+                [in] sgx_aes_gcm_128bit_tag_t* mac);
+
+        public int32_t lc_ecall_rand(uint32_t buffer_size, [out, size=buffer_size]uint8_t* buffer);
+
+        public int32_t lc_ecall_sha256_hash(uint64_t content_size, 
+                [in, size=content_size] const uint8_t* content, 
+                [out] sgx_sha256_hash_t* hash);
+    };
+
+    untrusted {
+    };
+};

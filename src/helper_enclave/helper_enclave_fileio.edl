@@ -1,0 +1,11 @@
+enclave {
+    untrusted {
+        void ocall_hafio_read_line(int reader_handle, 
+                uint64_t line_buffer_size, 
+                [out, size=line_buffer_size]char* line_buffer);
+        int ocall_hafio_read_eof(int reader_handle);
+
+        void ocall_hafio_write_line(int writer_handle, 
+            [in, string]const char* line_to_write);
+    };
+};
